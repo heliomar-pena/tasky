@@ -3,67 +3,154 @@ import {
   Pressable,
   StyleProp,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 import { Button } from "../ui/Button";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { borderRadius, boxShadow, color, fontSize, spacing } from "@/theme";
 import { Typography } from "../ui/Typography";
+import { toast } from "sonner-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 type TaskProps = {
   task: TaskI;
-  focused?: boolean;
-  onFocus?: (task: TaskI) => void;
   onEditTask?: (task: TaskI) => void;
   onComplete: (task: TaskI) => Promise<void>;
   onDelete: (task: TaskI) => Promise<void>;
+  insertTask: (task: TaskI) => void;
   style?: StyleProp<ViewStyle>;
 };
 
 export const Task = ({
   task,
   onComplete,
-  focused,
+  insertTask,
   onEditTask,
   onDelete,
-  onFocus,
   style,
 }: TaskProps) => {
+  const pressed = useSharedValue(false);
+  const offset = useSharedValue<number>(0);
+  const deleteButtonWidth = useSharedValue(0);
+
+  const drag = Gesture.Pan()
+    .onBegin(() => {
+      pressed.value = true;
+    })
+    .onChange((event) => {
+      offset.value = event.translationX;
+      if (offset.value > 30) {
+        deleteButtonWidth.value = withSpring(60);
+      } else {
+        deleteButtonWidth.value = withSpring(0);
+      }
+    })
+    .onFinalize(() => {
+      offset.value = withSpring(offset.value > 50 ? 60 : 0);
+      pressed.value = false;
+    });
+
+  const handleOnComplete = () => {
+    onComplete(task).then(() => {
+      toast.success(
+        task.completed
+          ? `Task ${task.title} marked as incompleted`
+          : `Task ${task.title} marked as complete`,
+        {
+          id: task.id,
+        },
+      );
+    });
+  };
+
+  const animatedTaskStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: withTiming(pressed.value ? 0.97 : 1, {
+            duration: 100,
+          }),
+        },
+      ],
+      opacity: withTiming(pressed.value ? 0.9 : 1, {
+        duration: 100,
+      }),
+    };
+  });
+
+  const handleOnDelete = () => {
+    onDelete(task).then(() => {
+      toast.success(`Task ${task.title} deleted`, {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            insertTask(task);
+            toast.info(`Task ${task.title} restored`, {
+              id: task.id,
+              action: null,
+            });
+          },
+        },
+        id: task.id,
+      });
+    });
+  };
+
   return (
-    <View style={[styles.task, style]}>
-      {focused && (
+    <Animated.View
+      layout={LinearTransition}
+      entering={FadeIn}
+      exiting={FadeOut}
+      style={[styles.task, style, animatedTaskStyle]}
+    >
+      <Animated.View
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          width: deleteButtonWidth,
+        }}
+      >
         <Button
           variant="outline"
           style={styles.taskCompleteButton}
-          onPress={() => onDelete(task)}
+          onPress={handleOnDelete}
         >
           <MaterialIcons
             style={{ fontSize: fontSize.h4, color: color.error.base }}
             name="delete"
           />
         </Button>
-      )}
-      <Pressable
-        style={styles.taskTitleContainer}
-        onPress={() => onFocus?.(task)}
-        onLongPress={() => onEditTask?.(task)}
-      >
-        <Typography.Body
-          style={[
-            styles.taskTitle,
-            task.completed && styles.taskTitleCompleted,
-          ]}
+      </Animated.View>
+      <GestureDetector gesture={drag}>
+        <Pressable
+          style={styles.taskTitleContainer}
+          onLongPress={() => onEditTask?.(task)}
         >
-          {task.title}
-        </Typography.Body>
-      </Pressable>
+          <Typography.Body
+            style={[
+              styles.taskTitle,
+              task.completed && styles.taskTitleCompleted,
+            ]}
+          >
+            {task.title}
+          </Typography.Body>
+        </Pressable>
+      </GestureDetector>
       <View style={styles.taskActions}>
         <Button
           variant="outline"
           style={styles.taskCompleteButton}
-          onPress={() => onComplete(task)}
+          onPress={handleOnComplete}
         >
           <MaterialIcons
             style={{ fontSize: fontSize.h4, color: color.success.base }}
@@ -71,7 +158,7 @@ export const Task = ({
           />
         </Button>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -85,9 +172,11 @@ const styles = StyleSheet.create({
     height: 60,
     backgroundColor: color.white,
     boxShadow: boxShadow.light,
+    position: "relative",
   },
   taskTitleCompleted: {
     textDecorationLine: "line-through",
+    textDecorationStyle: "solid",
   },
   taskTitleContainer: {
     flex: 1,

@@ -2,8 +2,9 @@ import { StyleSheet, View } from "react-native";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { color, fontSize, spacing } from "@/theme";
+import { color, spacing } from "@/theme";
 import { useState } from "react";
+import { toast } from "sonner-native";
 
 export type CreateTaskProps = {
   onCreateTask?: (title: string) => Promise<void>;
@@ -14,7 +15,8 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
 
   const handleOnCreateTask = () => {
     if (onCreateTask) {
-      onCreateTask(title).then(() => setTitle(""));
+      onCreateTask(title).then(() => setTitle("")).catch((error) => toast
+      .error(error?.message ?? "Error creating task"));
     }
   };
 
