@@ -145,7 +145,7 @@ export default function Index() {
           onDismiss={onCloseModal}
           task={taskInEdit}
         />
-        <Tips />
+        <Tips disableTips={!filteredTasks.length} />
       </View>
     </SafeAreaView>
   );

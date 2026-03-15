@@ -6,12 +6,12 @@ import { StyleSheet } from "react-native";
 import { borderRadius, color, spacing } from "@/theme";
 
 const TIPS = [
-  "Swipe to the right to delete a task",
   "Long press a task to edit it",
-  "A task was deleted by mistake? Recover it pressing the undo button on the notification"
+  "Swipe to the right to delete a task",
+  "A task was deleted by mistake? Recover it pressing the undo button on the notification",
 ];
 
-export const Tips = () => {
+export const Tips = ({ disableTips }: { disableTips: boolean }) => {
   const [currentTip, setCurrentTip] = useState(0);
   const [hideTips, setHideTips] = useState(false);
 
@@ -25,7 +25,7 @@ export const Tips = () => {
     setCurrentTip((prevTip) => (prevTip + 1) % TIPS.length);
   };
 
-  if (hideTips) return null;
+  if (hideTips || disableTips) return null;
 
   return (
     <Animated.View style={styles.tip}>
@@ -56,11 +56,12 @@ const styles = StyleSheet.create({
   },
   tipText: {
     paddingLeft: spacing[2],
+    paddingTop: spacing[2],
     flexGrow: 3,
     color: color.primary.contrast,
-    width: '100%'
+    width: "100%",
   },
   tipButton: {
-    alignSelf: "flex-end"
-  }
+    alignSelf: "flex-end",
+  },
 });

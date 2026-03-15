@@ -40,7 +40,6 @@ export const Task = ({
   style,
 }: TaskProps) => {
   const pressed = useSharedValue(false);
-  const offset = useSharedValue<number>(0);
   const deleteButtonWidth = useSharedValue(0);
 
   const drag = Gesture.Pan()
@@ -48,15 +47,13 @@ export const Task = ({
       pressed.value = true;
     })
     .onChange((event) => {
-      offset.value = event.translationX;
-      if (offset.value > 30) {
-        deleteButtonWidth.value = withSpring(60);
-      } else {
+      if (event.translationX < 30) {
         deleteButtonWidth.value = withSpring(0);
+      } else {
+        deleteButtonWidth.value = withSpring(60);
       }
     })
     .onFinalize(() => {
-      offset.value = withSpring(offset.value > 50 ? 60 : 0);
       pressed.value = false;
     });
 
@@ -113,51 +110,59 @@ export const Task = ({
       exiting={FadeOut}
       style={[styles.task, style, animatedTaskStyle]}
     >
-      <Animated.View
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          width: deleteButtonWidth,
-        }}
-      >
-        <Button
-          variant="outline"
-          style={styles.taskCompleteButton}
-          onPress={handleOnDelete}
+      <View style={[styles.taskHeader]}>
+        <Animated.View
+          style={[
+            { width: 0 },
+            {
+              position: "relative",
+              overflow: "hidden",
+              width: deleteButtonWidth,
+            },
+          ]}
         >
-          <MaterialIcons
-            style={{ fontSize: fontSize.h4, color: color.error.base }}
-            name="delete"
-          />
-        </Button>
-      </Animated.View>
-      <GestureDetector gesture={drag}>
-        <Pressable
-          style={styles.taskTitleContainer}
-          onLongPress={() => onEditTask?.(task)}
-        >
-          <Typography.Body
-            style={[
-              styles.taskTitle,
-              task.completed && styles.taskTitleCompleted,
-            ]}
+          <Button
+            variant="outline"
+            style={styles.taskCompleteButton}
+            onPress={handleOnDelete}
           >
-            {task.title}
-          </Typography.Body>
-        </Pressable>
-      </GestureDetector>
-      <View style={styles.taskActions}>
-        <Button
-          variant="outline"
-          style={styles.taskCompleteButton}
-          onPress={handleOnComplete}
-        >
-          <MaterialIcons
-            style={{ fontSize: fontSize.h4, color: color.success.base }}
-            name={task.completed ? "check-box" : "check-box-outline-blank"}
-          />
-        </Button>
+            <MaterialIcons
+              style={{ fontSize: fontSize.h4, color: color.error.base }}
+              name="delete"
+            />
+          </Button>
+        </Animated.View>
+        <GestureDetector gesture={drag}>
+          <Pressable
+            style={styles.taskTitleContainer}
+            onLongPress={() => onEditTask?.(task)}
+          >
+            <Typography.Body
+              style={[
+                styles.taskTitle,
+                task.completed && styles.taskTitleCompleted,
+              ]}
+            >
+              {task.title}
+            </Typography.Body>
+          </Pressable>
+        </GestureDetector>
+        <View style={styles.taskActions}>
+          <Button
+            variant="outline"
+            style={styles.taskCompleteButton}
+            onPress={handleOnComplete}
+          >
+            <MaterialIcons
+              style={{ fontSize: fontSize.h4, color: color.success.base }}
+              name={task.completed ? "check-box" : "check-box-outline-blank"}
+            />
+          </Button>
+        </View>
       </View>
+      <Typography style={styles.taskDescription} size="small">
+        {task.description}
+      </Typography>
     </Animated.View>
   );
 };
@@ -165,14 +170,24 @@ export const Task = ({
 const styles = StyleSheet.create({
   task: {
     display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
     borderRadius: borderRadius.normal,
     overflow: "hidden",
-    height: 60,
     backgroundColor: color.white,
     boxShadow: boxShadow.light,
+  },
+  taskHeader: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    height: 60,
     position: "relative",
+    flex: 1,
+  },
+  taskDescription: {
+    color: color.gray,
+    paddingLeft: spacing[2],
+    paddingBottom: spacing[2],
   },
   taskTitleCompleted: {
     textDecorationLine: "line-through",
