@@ -10,6 +10,7 @@ Basic task manager app made with React Native.
   - [How to run the App](#how-to-run-the-app)
     - [Pre-requisites](#pre-requisites)
     - [How to run it](#how-to-run-it)
+      - [Run it with docker (alternative)](#run-it-with-docker-alternative)
   - [Technologies used](#technologies-used)
   - [Decisions Taken](#decisions-taken)
   - [Areas to improve](#areas-to-improve)
@@ -60,6 +61,14 @@ Basic task manager app made with React Native.
    1. In the browser: go to [localhost:8081](localhost:8081)
    2. In mobile: Scan the QR code with Expo to Go
 
+#### Run it with docker (alternative)
+
+Project can be ran using Docker, this will only work with web mode by the moment but if it's needed, here is the instructions to run it:
+
+```sh
+docker compose up
+```
+
 ## Technologies used
 
 | Techonlogy    | Description                                                                                                                     |
@@ -83,3 +92,4 @@ Basic task manager app made with React Native.
 - Maybe a searchbar, category or filters by date would be useful to avoid having a lot of tasks on only one page.
 - The "Tip" menu could be displayed by using Toast notification, that would be better as it would avoid the notifications to hide it.
 - It could be added unit and integration testing.
+- Docker can be configured to allow using Expo Go when project is ran dockerized.
