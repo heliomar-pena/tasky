@@ -2,7 +2,7 @@ import { Typography } from "@/components/ui/Typography";
 import { spacing } from "@/theme";
 import { FlatList, StyleSheet, View } from "react-native";
 import { CreateTask } from "@/components/home/CreateTask";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { TaskI } from "@/interfaces/Task.interface";
 import { Task } from "@/components/home/Task";
 import { EditTask } from "@/components/home/EditTask";
@@ -16,7 +16,10 @@ export default function Index() {
   const [taskInEdit, setTaskInEdit] = useState<TaskI | null>(null);
   const [activeFilter, setActiveFilter] = useState<FiltersI>("all");
 
+  const atLeastOneTaskCreated = useRef(false);
+
   const onCreateTask = (title: string) => {
+    atLeastOneTaskCreated.current = true;
     if (!title.trim()) {
       return Promise.reject(new Error("Task title is required"));
     }
@@ -74,7 +77,7 @@ export default function Index() {
     setTaskInEdit(task);
   };
 
-  const onConfirmEdit = (task: TaskI) => {
+  const onConfirmEdit = async (task: TaskI) => {
     return editTask(task).then(() => {
       setTaskInEdit(null);
     });
@@ -145,7 +148,7 @@ export default function Index() {
           onDismiss={onCloseModal}
           task={taskInEdit}
         />
-        <Tips disableTips={!filteredTasks.length} />
+        <Tips disableTips={!atLeastOneTaskCreated.current} />
       </View>
     </SafeAreaView>
   );

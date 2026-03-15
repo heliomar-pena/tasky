@@ -1,50 +1,85 @@
-# Welcome to your Expo app 👋
+# Tasky - Simple Task Manager App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Basic task manager app made with React Native.
 
-## Get started
+## Table of Content
 
-1. Install dependencies
+- [Tasky - Simple Task Manager App](#tasky---simple-task-manager-app)
+  - [Table of Content](#table-of-content)
+  - [Features](#features)
+  - [How to run the App](#how-to-run-the-app)
+    - [Pre-requisites](#pre-requisites)
+    - [How to run it](#how-to-run-it)
+  - [Technologies used](#technologies-used)
+  - [Decisions Taken](#decisions-taken)
+  - [Areas to improve](#areas-to-improve)
 
-   ```bash
+## Features
+
+- Create a task with description.
+- Mark a task as completed, incompleted or delete it.
+- Filter tasks by task status.
+- Tasks are ordered based on creation time.
+- Completed tasks are moved at end of the list, keeping important tasks at the top of the list.
+- Feedback to user interactions with animations.
+- Feedback to user with toast notifications.
+- Optimistic updates with Undo button for delete actions.
+- Edit a task to add more details, like a description.
+- Delete task to keep focus on the important tasks.
+
+## How to run the App
+
+### Pre-requisites
+
+1. Node 24.13.0
+2. Expo GO installed on Android or iOs device (for App Preview)
+
+### How to run it
+
+1. Clone the repo
+
+   ```sh
+   git clone https://github.com/heliomar-pena/tasky.git
+   # Or with SSH
+   git clone git@github.com:heliomar-pena/tasky.git
+   ```
+
+2. Install the dependencies
+
+   ```sh
    npm install
    ```
 
-2. Start the app
+3. Start the application
 
-   ```bash
-   npx expo start
+   ```sh
+   npm run start
    ```
 
-In the output, you'll find options to open the app in a
+4. Open the app:
+   1. In the browser: go to [localhost:8081](localhost:8081)
+   2. In mobile: Scan the QR code with Expo to Go
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Technologies used
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+| Techonlogy    | Description                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Expo          | Framework built at the top of React Native making better the development experience.                                            |
+| React Native  | Framework that allows creating multi-platform applications using React as syntax.                                               |
+| Reanimated    | An animation's library for react native. Used for creating reactive interactions giving feedback to user's via animations       |
+| Sonner Native | A port to React Native for the sonner library. Used for giving feedback to user via toast notifications and optimistic updates. |
 
-## Get a fresh project
+## Decisions Taken
 
-When you're ready, run:
+- Tasks are sorted by creation date, and completed tasks are moved to the end of the list. this is made to keep the tasks that are interesting for our users at the top of the list, preventing the user from scrolling when there are too many tasks. However, this can be very confuse for the user when the change happens instantly, so added a transition during the position change of the elements to help the user to understand what happened.
+- Tasks are created only with the title, then user can edit to add more details. This is made this way to allow the user to create tasks quickly, then focus on add details if needed. This improves the user experience as the user does not needs a different screen to create a task, it can create multiple tasks quickly from the same screen, then fill the details if needed.
+- Added filters by status. These filters allows the user to focus only on the pending tasks more than on all the tasks.
+- Hiden Delete button to avoid user clicking it by error. This way also the UI looks cleaner as it does not have unnecesary buttons on the screen: If the user needs a delete button, can swipe the task to the right to make it appear, then click delete. Yet if a user clicks the delete button by error, can Undo the change by clicking Undo button on the toast notification.
 
-```bash
-npm run reset-project
-```
+## Areas to improve
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Animations could be smoother and cleaner.
+- Could be added a transition on the Create Task input when the button appears.
+- Maybe a searchbar, category or filters by date would be useful to avoid having a lot of tasks on only one page.
+- The "Tip" menu could be displayed by using Toast notification, that would be better as it would avoid the notifications to hide it.
+- It could be added unit and integration testing.

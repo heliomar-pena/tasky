@@ -42,7 +42,7 @@ export const Task = ({
   const pressed = useSharedValue(false);
   const deleteButtonWidth = useSharedValue(0);
 
-  const drag = Gesture.Pan()
+  const swipe = Gesture.Pan()
     .onBegin(() => {
       pressed.value = true;
     })
@@ -132,7 +132,7 @@ export const Task = ({
             />
           </Button>
         </Animated.View>
-        <GestureDetector gesture={drag}>
+        <GestureDetector gesture={swipe}>
           <Pressable
             style={styles.taskTitleContainer}
             onLongPress={() => onEditTask?.(task)}

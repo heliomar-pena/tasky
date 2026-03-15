@@ -1,4 +1,4 @@
-import { StyleSheet, Switch, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Button } from "../ui/Button";
 import { color, spacing } from "@/theme";
 
